@@ -2,17 +2,17 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Starter_Plugin_Settings Class
+ * Comrade_Settings Class
  *
- * @class Starter_Plugin_Settings
+ * @class Comrade_Settings
  * @version	1.0.0
- * @since 1.0.0
- * @package	Starter_Plugin
- * @author Jeffikus
+ * @since		1.0.0
+ * @package	Comrade
+ * @author	Jeffikus
  */
-final class Starter_Plugin_Settings {
+final class Comrade_Settings {
 	/**
-	 * Starter_Plugin_Admin The single instance of Starter_Plugin_Admin.
+	 * Comrade_Admin The single instance of Comrade_Admin.
 	 * @var 	object
 	 * @access  private
 	 * @since 	1.0.0
@@ -28,13 +28,13 @@ final class Starter_Plugin_Settings {
 	private $_has_select;
 
 	/**
-	 * Main Starter_Plugin_Settings Instance
+	 * Main Comrade_Settings Instance
 	 *
-	 * Ensures only one instance of Starter_Plugin_Settings is loaded or can be loaded.
+	 * Ensures only one instance of Comrade_Settings is loaded or can be loaded.
 	 *
 	 * @since 1.0.0
 	 * @static
-	 * @return Main Starter_Plugin_Settings instance
+	 * @return Main Comrade_Settings instance
 	 */
 	public static function instance () {
 		if ( is_null( self::$_instance ) )
@@ -71,7 +71,7 @@ final class Starter_Plugin_Settings {
 				$method = 'validate_field_' . $fields[$k]['type'];
 
 				if ( ! method_exists( $this, $method ) ) {
-					if ( true === (bool)apply_filters( 'starter-plugin-validate-field-' . $fields[$k]['type'] . '_use_default', true ) ) {
+					if ( true === (bool)apply_filters( 'comrade-validate-field-' . $fields[$k]['type'] . '_use_default', true ) ) {
 						$method = 'validate_field_text';
 					} else {
 						$method = '';
@@ -80,10 +80,10 @@ final class Starter_Plugin_Settings {
 
 				// If we have an internal method for validation, filter and apply it.
 				if ( '' != $method ) {
-					add_filter( 'starter-plugin-validate-field-' . $fields[$k]['type'], array( $this, $method ) );
+					add_filter( 'comrade-validate-field-' . $fields[$k]['type'], array( $this, $method ) );
 				}
 
-				$method_output = apply_filters( 'starter-plugin-validate-field-' . $fields[$k]['type'], $v, $fields[$k] );
+				$method_output = apply_filters( 'comrade-validate-field-' . $fields[$k]['type'], $v, $fields[$k] );
 
 				if ( ! is_wp_error( $method_output ) ) {
 					$input[$k] = $method_output;
@@ -189,7 +189,7 @@ final class Starter_Plugin_Settings {
 		}
 
 		// Construct the key.
-		$key 				= Starter_Plugin()->token . '-' . $args['section'] . '[' . $args['id'] . ']';
+		$key 				= Comrade()->token . '-' . $args['section'] . '[' . $args['id'] . ']';
 		$method_output 		= $this->$method( $key, $args );
 
 		if ( ! is_wp_error( $method_output ) ) {
@@ -197,10 +197,10 @@ final class Starter_Plugin_Settings {
 		}
 
 		// Output the description, if the current field allows it.
-		if ( isset( $args['type'] ) && ! in_array( $args['type'], (array)apply_filters( 'starter-plugin-no-description-fields', array( 'checkbox' ) ) ) ) {
+		if ( isset( $args['type'] ) && ! in_array( $args['type'], (array)apply_filters( 'comrade-no-description-fields', array( 'checkbox' ) ) ) ) {
 			if ( isset( $args['description'] ) ) {
 				$description = '<p class="description">' . wp_kses_post( $args['description'] ) . '</p>' . "\n";
-				if ( in_array( $args['type'], (array)apply_filters( 'starter-plugin-new-line-description-fields', array( 'textarea', 'select' ) ) ) ) {
+				if ( in_array( $args['type'], (array)apply_filters( 'comrade-new-line-description-fields', array( 'textarea', 'select' ) ) ) ) {
 					$description = wpautop( $description );
 				}
 				$html .= $description;
@@ -219,13 +219,13 @@ final class Starter_Plugin_Settings {
 	public function get_settings_sections () {
 		$settings_sections = array();
 
-		$settings_sections['standard-fields'] = __( 'Standard Fields', 'starter-plugin' );
-		$settings_sections['special-fields'] = __( 'Special Fields', 'starter-plugin' );
+		$settings_sections['standard-fields'] = __( 'Standard Fields', 'comrade' );
+		$settings_sections['special-fields'] = __( 'Special Fields', 'comrade' );
 		// Add your new sections below here.
 		// Admin tabs will be created for each section.
 		// Don't forget to add fields for the section in the get_settings_fields() function below
 
-		return (array)apply_filters( 'starter-plugin-settings-sections', $settings_sections );
+		return (array)apply_filters( 'comrade-settings-sections', $settings_sections );
 	} // End get_settings_sections()
 
 	/**
@@ -243,60 +243,60 @@ final class Starter_Plugin_Settings {
 			case 'standard-fields':
 
 				$settings_fields['text'] = array(
-												'name' => __( 'Example Text Input', 'starter-plugin' ),
+												'name' => __( 'Example Text Input', 'comrade' ),
 												'type' => 'text',
 												'default' => '',
 												'section' => 'standard-fields',
-												'description' => __( 'Place the field description text here.', 'starter-plugin' )
+												'description' => __( 'Place the field description text here.', 'comrade' )
 											);
 				$settings_fields['textarea'] = array(
-												'name' => __( 'Example Textarea', 'starter-plugin' ),
+												'name' => __( 'Example Textarea', 'comrade' ),
 												'type' => 'textarea',
 												'default' => '',
 												'section' => 'standard-fields',
-												'description' => __( 'Place the field description text here.', 'starter-plugin' )
+												'description' => __( 'Place the field description text here.', 'comrade' )
 											);
 				$settings_fields['checkbox'] = array(
-												'name' => __( 'Example Checkbox', 'starter-plugin' ),
+												'name' => __( 'Example Checkbox', 'comrade' ),
 												'type' => 'checkbox',
 												'default' => '',
 												'section' => 'standard-fields',
-												'description' => __( 'Place the field description text here.', 'starter-plugin' )
+												'description' => __( 'Place the field description text here.', 'comrade' )
 											);
 				$settings_fields['radio'] = array(
-												'name' => __( 'Example Radio Buttons', 'starter-plugin' ),
+												'name' => __( 'Example Radio Buttons', 'comrade' ),
 												'type' => 'radio',
 												'default' => '',
 												'section' => 'standard-fields',
 												'options' => array(
-																	'one' => __( 'One', 'starter-plugin' ),
-																	'two' => __( 'Two', 'starter-plugin' ),
-																	'three' => __( 'Three', 'starter-plugin' )
+																	'one' => __( 'One', 'comrade' ),
+																	'two' => __( 'Two', 'comrade' ),
+																	'three' => __( 'Three', 'comrade' )
 															),
-												'description' => __( 'Place the field description text here.', 'starter-plugin' )
+												'description' => __( 'Place the field description text here.', 'comrade' )
 											);
 				$settings_fields['select'] = array(
-													'name' => __( 'Example Select', 'starter-plugin' ),
+													'name' => __( 'Example Select', 'comrade' ),
 													'type' => 'select',
 													'default' => '',
 													'section' => 'standard-fields',
 													'options' => array(
-																	'one' => __( 'One', 'starter-plugin' ),
-																	'two' => __( 'Two', 'starter-plugin' ),
-																	'three' => __( 'Three', 'starter-plugin' )
+																	'one' => __( 'One', 'comrade' ),
+																	'two' => __( 'Two', 'comrade' ),
+																	'three' => __( 'Three', 'comrade' )
 																),
-													'description' => __( 'Place the field description text here.', 'starter-plugin' )
+													'description' => __( 'Place the field description text here.', 'comrade' )
 											);
 
 				break;
 			case 'special-fields':
 
 				$settings_fields['select_taxonomy'] = array(
-													'name' => __( 'Example Taxonomy Selector', 'starter-plugin' ),
+													'name' => __( 'Example Taxonomy Selector', 'comrade' ),
 													'type' => 'select_taxonomy',
 													'default' => '',
 													'section' => 'special-fields',
-													'description' => __( 'Place the field description text here.', 'starter-plugin' )
+													'description' => __( 'Place the field description text here.', 'comrade' )
 											);
 
 				break;
@@ -305,7 +305,7 @@ final class Starter_Plugin_Settings {
 				break;
 		}
 
-		return (array)apply_filters( 'starter-plugin-settings-fields', $settings_fields );
+		return (array)apply_filters( 'comrade-settings-fields', $settings_fields );
 	} // End get_settings_fields()
 
 	/**
@@ -470,7 +470,7 @@ final class Starter_Plugin_Settings {
 	 * @return  array Supported field type keys.
 	 */
 	public function get_supported_fields () {
-		return (array)apply_filters( 'starter-plugin-supported-fields', array( 'text', 'checkbox', 'radio', 'textarea', 'select', 'select_taxonomy' ) );
+		return (array)apply_filters( 'comrade-supported-fields', array( 'text', 'checkbox', 'radio', 'textarea', 'select', 'select_taxonomy' ) );
 	} // End get_supported_fields()
 
 	/**
@@ -483,7 +483,7 @@ final class Starter_Plugin_Settings {
 	 * @return  mixed Returned value.
 	 */
 	public function get_value ( $key, $default, $section ) {
-		$values = get_option( 'starter-plugin-' . $section, array() );
+		$values = get_option( 'comrade-' . $section, array() );
 
 		if ( is_array( $values ) && isset( $values[$key] ) ) {
 			$response = $values[$key];
@@ -513,7 +513,7 @@ final class Starter_Plugin_Settings {
 		if ( 0 < count( $sections ) ) {
 			foreach ( $sections as $k => $v ) {
 				$fields = $this->get_settings_fields( $v );
-				$values = get_option( 'starter-plugin-' . $v, array() );
+				$values = get_option( 'comrade-' . $v, array() );
 
 				if ( is_array( $fields ) && 0 < count( $fields ) ) {
 					foreach ( $fields as $i => $j ) {

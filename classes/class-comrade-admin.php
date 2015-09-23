@@ -2,19 +2,19 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Starter_Plugin_Admin Class
+ * Comrade_Admin Class
  *
- * @class Starter_Plugin_Admin
+ * @class Comrade_Admin
  * @version	1.0.0
- * @since 1.0.0
- * @package	Starter_Plugin
- * @author Jeffikus
+ * @since		1.0.0
+ * @package	Comrade
+ * @author	Chris Seidl
  */
-final class Starter_Plugin_Admin {
+final class Comrade_Admin {
 	/**
-	 * Starter_Plugin_Admin The single instance of Starter_Plugin_Admin.
-	 * @var 	object
-	 * @access  private
+	 * Comrade_Admin The single instance of Comrade_Admin.
+	 * @var		object
+	 * @access	private
 	 * @since 	1.0.0
 	 */
 	private static $_instance = null;
@@ -41,13 +41,13 @@ final class Starter_Plugin_Admin {
 	} // End __construct()
 
 	/**
-	 * Main Starter_Plugin_Admin Instance
+	 * Main Comrade_Admin Instance
 	 *
-	 * Ensures only one instance of Starter_Plugin_Admin is loaded or can be loaded.
+	 * Ensures only one instance of Comrade_Admin is loaded or can be loaded.
 	 *
 	 * @since 1.0.0
 	 * @static
-	 * @return Main Starter_Plugin_Admin instance
+	 * @return Main Comrade_Admin instance
 	 */
 	public static function instance () {
 		if ( is_null( self::$_instance ) )
@@ -62,7 +62,7 @@ final class Starter_Plugin_Admin {
 	 * @return  void
 	 */
 	public function register_settings_screen () {
-		$this->_hook = add_submenu_page( 'options-general.php', __( 'Starter Plugin Settings', 'starter-plugin' ), __( 'Starter Plugin', 'starter-plugin' ), 'manage_options', 'starter-plugin', array( $this, 'settings_screen' ) );
+		$this->_hook = add_submenu_page( 'options-general.php', __( 'Comrade', 'comrade' ), __( 'Comrade', 'comrade' ), 'manage_options', 'comrade', array( $this, 'settings_screen' ) );
 	} // End register_settings_screen()
 
 	/**
@@ -73,18 +73,18 @@ final class Starter_Plugin_Admin {
 	 */
 	public function settings_screen () {
 		global $title;
-		$sections = Starter_Plugin()->settings->get_settings_sections();
+		$sections = Comrade()->settings->get_settings_sections();
 		$tab = $this->_get_current_tab( $sections );
 		?>
-		<div class="wrap starter-plugin-wrap">
+		<div class="wrap comrade-wrap">
 			<?php
 				echo $this->get_admin_header_html( $sections, $title );
 			?>
 			<form action="options.php" method="post">
 				<?php
-					settings_fields( 'starter-plugin-settings-' . $tab );
-					do_settings_sections( 'starter-plugin-' . $tab );
-					submit_button( __( 'Save Changes', 'starter-plugin' ) );
+					settings_fields( 'comrade-settings-' . $tab );
+					do_settings_sections( 'comrade-' . $tab );
+					submit_button( __( 'Save Changes', 'comrade' ) );
 				?>
 			</form>
 		</div><!--/.wrap-->
@@ -98,11 +98,11 @@ final class Starter_Plugin_Admin {
 	 * @return  void
 	 */
 	public function register_settings () {
-		$sections = Starter_Plugin()->settings->get_settings_sections();
+		$sections = Comrade()->settings->get_settings_sections();
 		if ( 0 < count( $sections ) ) {
 			foreach ( $sections as $k => $v ) {
-				register_setting( 'starter-plugin-settings-' . sanitize_title_with_dashes( $k ), 'starter-plugin-' . $k, array( $this, 'validate_settings' ) );
-				add_settings_section( sanitize_title_with_dashes( $k ), $v, array( $this, 'render_settings' ), 'starter-plugin-' . $k, $k, $k );
+				register_setting( 'comrade-settings-' . sanitize_title_with_dashes( $k ), 'comrade-' . $k, array( $this, 'validate_settings' ) );
+				add_settings_section( sanitize_title_with_dashes( $k ), $v, array( $this, 'render_settings' ), 'comrade-' . $k, $k, $k );
 			}
 		}
 	} // End register_settings()
@@ -116,14 +116,14 @@ final class Starter_Plugin_Admin {
 	 */
 	public function render_settings ( $args ) {
 		$token = $args['id'];
-		$fields = Starter_Plugin()->settings->get_settings_fields( $token );
+		$fields = Comrade()->settings->get_settings_fields( $token );
 
 		if ( 0 < count( $fields ) ) {
 			foreach ( $fields as $k => $v ) {
 				$args 		= $v;
 				$args['id'] = $k;
 
-				add_settings_field( $k, $v['name'], array( Starter_Plugin()->settings, 'render_field' ), 'starter-plugin-' . $token , $v['section'], $args );
+				add_settings_field( $k, $v['name'], array( Comrade()->settings, 'render_field' ), 'comrade-' . $token , $v['section'], $args );
 			}
 		}
 	} // End render_settings()
@@ -136,9 +136,9 @@ final class Starter_Plugin_Admin {
 	 * @return  array        Validated data.
 	 */
 	public function validate_settings ( $input ) {
-		$sections = Starter_Plugin()->settings->get_settings_sections();
+		$sections = Comrade()->settings->get_settings_sections();
 		$tab = $this->_get_current_tab( $sections );
-		return Starter_Plugin()->settings->validate_settings( $input, $tab );
+		return Comrade()->settings->validate_settings( $input, $tab );
 	} // End validate_settings()
 
 	/**
@@ -152,7 +152,7 @@ final class Starter_Plugin_Admin {
 	public function get_admin_header_html ( $sections, $title ) {
 		$defaults = array(
 							'tag' => 'h2',
-							'atts' => array( 'class' => 'starter-plugin-wrapper' ),
+							'atts' => array( 'class' => 'comrade-wrapper' ),
 							'content' => $title
 						);
 
@@ -203,7 +203,7 @@ final class Starter_Plugin_Admin {
 	 * @return  array 			 An array of data with which to mark up the header HTML.
 	 */
 	private function _get_admin_header_data ( $sections, $title ) {
-		$response = array( 'tag' => 'h2', 'atts' => array( 'class' => 'starter-plugin-wrapper' ), 'content' => $title );
+		$response = array( 'tag' => 'h2', 'atts' => array( 'class' => 'comrade-wrapper' ), 'content' => $title );
 
 		if ( is_array( $sections ) && 1 < count( $sections ) ) {
 			$response['content'] = '';
@@ -217,10 +217,10 @@ final class Starter_Plugin_Admin {
 					$class .= ' nav-tab-active';
 				}
 
-				$response['content'] .= '<a href="' . admin_url( 'options-general.php?page=starter-plugin&tab=' . sanitize_title_with_dashes( $key ) ) . '" class="' . esc_attr( $class ) . '">' . esc_html( $value ) . '</a>';
+				$response['content'] .= '<a href="' . admin_url( 'options-general.php?page=comrade&tab=' . sanitize_title_with_dashes( $key ) ) . '" class="' . esc_attr( $class ) . '">' . esc_html( $value ) . '</a>';
 			}
 		}
 
-		return (array)apply_filters( 'starter-plugin-get-admin-header-data', $response );
+		return (array)apply_filters( 'comrade-get-admin-header-data', $response );
 	} // End _get_admin_header_data()
 } // End Class

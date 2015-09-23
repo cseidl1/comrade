@@ -2,17 +2,17 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 
 /**
- * Starter Plugin Post Type Class
+ * Comrade Post Type Class
  *
- * All functionality pertaining to post types in Starter Plugin.
+ * All functionality pertaining to post types in Comrade.
  *
  * @package WordPress
- * @subpackage Starter_Plugin
+ * @subpackage Comrade
  * @category Plugin
  * @author Matty
  * @since 1.0.0
  */
-class Starter_Plugin_Post_Type {
+class Comrade_Post_Type {
 	/**
 	 * The post type token.
 	 * @access public
@@ -95,23 +95,23 @@ class Starter_Plugin_Post_Type {
 	 */
 	public function register_post_type () {
 		$labels = array(
-			'name' => sprintf( _x( '%s', 'post type general name', 'starter-plugin' ), $this->plural ),
-			'singular_name' => sprintf( _x( '%s', 'post type singular name', 'starter-plugin' ), $this->singular ),
-			'add_new' => _x( 'Add New', $this->post_type, 'starter-plugin' ),
-			'add_new_item' => sprintf( __( 'Add New %s', 'starter-plugin' ), $this->singular ),
-			'edit_item' => sprintf( __( 'Edit %s', 'starter-plugin' ), $this->singular ),
-			'new_item' => sprintf( __( 'New %s', 'starter-plugin' ), $this->singular ),
-			'all_items' => sprintf( __( 'All %s', 'starter-plugin' ), $this->plural ),
-			'view_item' => sprintf( __( 'View %s', 'starter-plugin' ), $this->singular ),
-			'search_items' => sprintf( __( 'Search %a', 'starter-plugin' ), $this->plural ),
-			'not_found' => sprintf( __( 'No %s Found', 'starter-plugin' ), $this->plural ),
-			'not_found_in_trash' => sprintf( __( 'No %s Found In Trash', 'starter-plugin' ), $this->plural ),
+			'name' => sprintf( _x( '%s', 'post type general name', 'comrade' ), $this->plural ),
+			'singular_name' => sprintf( _x( '%s', 'post type singular name', 'comrade' ), $this->singular ),
+			'add_new' => _x( 'Add New', $this->post_type, 'comrade' ),
+			'add_new_item' => sprintf( __( 'Add New %s', 'comrade' ), $this->singular ),
+			'edit_item' => sprintf( __( 'Edit %s', 'comrade' ), $this->singular ),
+			'new_item' => sprintf( __( 'New %s', 'comrade' ), $this->singular ),
+			'all_items' => sprintf( __( 'All %s', 'comrade' ), $this->plural ),
+			'view_item' => sprintf( __( 'View %s', 'comrade' ), $this->singular ),
+			'search_items' => sprintf( __( 'Search %a', 'comrade' ), $this->plural ),
+			'not_found' => sprintf( __( 'No %s Found', 'comrade' ), $this->plural ),
+			'not_found_in_trash' => sprintf( __( 'No %s Found In Trash', 'comrade' ), $this->plural ),
 			'parent_item_colon' => '',
 			'menu_name' => $this->plural,
 		);
 
-		$single_slug = apply_filters( 'starter-plugin_single_slug', _x( sanitize_title_with_dashes( $this->singular ), 'single post url slug', 'starter-plugin' ) );
-		$archive_slug = apply_filters( 'starter-plugin_archive_slug', _x( sanitize_title_with_dashes( $this->plural ), 'post archive url slug', 'starter-plugin' ) );
+		$single_slug = apply_filters( 'comrade_single_slug', _x( sanitize_title_with_dashes( $this->singular ), 'single post url slug', 'comrade' ) );
+		$archive_slug = apply_filters( 'comrade_archive_slug', _x( sanitize_title_with_dashes( $this->plural ), 'post archive url slug', 'comrade' ) );
 
 		$defaults = array(
 			'labels' => $labels,
@@ -141,7 +141,7 @@ class Starter_Plugin_Post_Type {
 	 * @return void
 	 */
 	public function register_taxonomy () {
-		$this->taxonomies['thing-category'] = new Starter_Plugin_Taxonomy(); // Leave arguments empty, to use the default arguments.
+		$this->taxonomies['thing-category'] = new Comrade_Taxonomy(); // Leave arguments empty, to use the default arguments.
 		$this->taxonomies['thing-category']->register();
 	} // End register_taxonomy()
 
@@ -179,7 +179,7 @@ class Starter_Plugin_Post_Type {
 	 * @return void
 	 */
 	public function register_custom_column_headings ( $defaults ) {
-		$new_columns = array( 'image' => __( 'Image', 'starter-plugin' ) );
+		$new_columns = array( 'image' => __( 'Image', 'comrade' ) );
 
 		$last_item = array();
 
@@ -213,19 +213,19 @@ class Starter_Plugin_Post_Type {
 
 		$messages[$this->post_type] = array(
 			0 => '', // Unused. Messages start at index 1.
-			1 => sprintf( __( '%3$s updated. %sView %4$s%s', 'starter-plugin' ), '<a href="' . esc_url( get_permalink( $post_ID ) ) . '">', '</a>', $this->singular, strtolower( $this->singular ) ),
-			2 => __( 'Custom field updated.', 'starter-plugin' ),
-			3 => __( 'Custom field deleted.', 'starter-plugin' ),
-			4 => sprintf( __( '%s updated.', 'starter-plugin' ), $this->singular ),
+			1 => sprintf( __( '%3$s updated. %sView %4$s%s', 'comrade' ), '<a href="' . esc_url( get_permalink( $post_ID ) ) . '">', '</a>', $this->singular, strtolower( $this->singular ) ),
+			2 => __( 'Custom field updated.', 'comrade' ),
+			3 => __( 'Custom field deleted.', 'comrade' ),
+			4 => sprintf( __( '%s updated.', 'comrade' ), $this->singular ),
 			/* translators: %s: date and time of the revision */
-			5 => isset($_GET['revision']) ? sprintf( __( '%s restored to revision from %s', 'starter-plugin' ), $this->singular, wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-			6 => sprintf( __( '%1$s published. %3$sView %2$s%4$s', 'starter-plugin' ), $this->singular, strtolower( $this->singular ), '<a href="' . esc_url( get_permalink( $post_ID ) ) . '">', '</a>' ),
-			7 => sprintf( __( '%s saved.', 'starter-plugin' ), $this->singular ),
-			8 => sprintf( __( '%s submitted. %sPreview %s%s', 'starter-plugin' ), $this->singular, strtolower( $this->singular ), '<a target="_blank" href="' . esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) . '">', '</a>' ),
-			9 => sprintf( __( '%s scheduled for: %1$s. %2$sPreview %s%3$s', 'starter-plugin' ), $this->singular, strtolower( $this->singular ),
+			5 => isset($_GET['revision']) ? sprintf( __( '%s restored to revision from %s', 'comrade' ), $this->singular, wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+			6 => sprintf( __( '%1$s published. %3$sView %2$s%4$s', 'comrade' ), $this->singular, strtolower( $this->singular ), '<a href="' . esc_url( get_permalink( $post_ID ) ) . '">', '</a>' ),
+			7 => sprintf( __( '%s saved.', 'comrade' ), $this->singular ),
+			8 => sprintf( __( '%s submitted. %sPreview %s%s', 'comrade' ), $this->singular, strtolower( $this->singular ), '<a target="_blank" href="' . esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) . '">', '</a>' ),
+			9 => sprintf( __( '%s scheduled for: %1$s. %2$sPreview %s%3$s', 'comrade' ), $this->singular, strtolower( $this->singular ),
 			// translators: Publish box date format, see http://php.net/date
 			'<strong>' . date_i18n( __( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ) . '</strong>', '<a target="_blank" href="' . esc_url( get_permalink($post_ID) ) . '">', '</a>' ),
-			10 => sprintf( __( '%s draft updated. %sPreview %s%s', 'starter-plugin' ), $this->singular, strtolower( $this->singular ), '<a target="_blank" href="' . esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) . '">', '</a>' ),
+			10 => sprintf( __( '%s draft updated. %sPreview %s%s', 'comrade' ), $this->singular, strtolower( $this->singular ), '<a target="_blank" href="' . esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) . '">', '</a>' ),
 		);
 
 		return $messages;
@@ -239,7 +239,7 @@ class Starter_Plugin_Post_Type {
 	 * @return void
 	 */
 	public function meta_box_setup () {
-		add_meta_box( $this->post_type . '-data', __( 'Thing Details', 'starter-plugin' ), array( $this, 'meta_box_content' ), $this->post_type, 'normal', 'high' );
+		add_meta_box( $this->post_type . '-data', __( 'Thing Details', 'comrade' ), array( $this, 'meta_box_content' ), $this->post_type, 'normal', 'high' );
 	} // End meta_box_setup()
 
 	/**
@@ -256,7 +256,7 @@ class Starter_Plugin_Post_Type {
 
 		$html = '';
 
-		$html .= '<input type="hidden" name="starter-plugin_' . $this->post_type . '_noonce" id="starter-plugin_' . $this->post_type . '_noonce" value="' . wp_create_nonce( plugin_basename( dirname( Starter_Plugin()->plugin_path ) ) ) . '" />';
+		$html .= '<input type="hidden" name="comrade_' . $this->post_type . '_noonce" id="comrade_' . $this->post_type . '_noonce" value="' . wp_create_nonce( plugin_basename( dirname( Comrade()->plugin_path ) ) ) . '" />';
 
 		if ( 0 < count( $field_data ) ) {
 			$html .= '<table class="form-table">' . "\n";
@@ -292,7 +292,7 @@ class Starter_Plugin_Post_Type {
 		global $post, $messages;
 
 		// Verify
-		if ( ( get_post_type() != $this->post_type ) || ! wp_verify_nonce( $_POST['starter-plugin_' . $this->post_type . '_noonce'], plugin_basename( dirname( Starter_Plugin()->plugin_path ) ) ) ) {
+		if ( ( get_post_type() != $this->post_type ) || ! wp_verify_nonce( $_POST['comrade_' . $this->post_type . '_noonce'], plugin_basename( dirname( Comrade()->plugin_path ) ) ) ) {
 			return $post_id;
 		}
 
@@ -338,7 +338,7 @@ class Starter_Plugin_Post_Type {
 	 */
 	public function enter_title_here ( $title ) {
 		if ( get_post_type() == $this->post_type ) {
-			$title = __( 'Enter the thing title here', 'starter-plugin' );
+			$title = __( 'Enter the thing title here', 'comrade' );
 		}
 		return $title;
 	} // End enter_title_here()
@@ -352,14 +352,14 @@ class Starter_Plugin_Post_Type {
 		$fields = array();
 
 		$fields['url'] = array(
-		    'name' => __( 'URL', 'starter-plugin' ),
-		    'description' => __( 'Enter a URL that applies to this thing (for example: http://domain.com/).', 'starter-plugin' ),
+		    'name' => __( 'URL', 'comrade' ),
+		    'description' => __( 'Enter a URL that applies to this thing (for example: http://domain.com/).', 'comrade' ),
 		    'type' => 'url',
 		    'default' => '',
 		    'section' => 'info'
 		);
 
-		return apply_filters( 'starter-plugin_custom_fields_settings', $fields );
+		return apply_filters( 'comrade_custom_fields_settings', $fields );
 	} // End get_custom_fields_settings()
 
 	/**
