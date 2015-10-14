@@ -1,5 +1,5 @@
 === Comrade ===
-Contributors:
+Contributors: Chris Seidl
 Donate link:
 Tags:
 Requires at least: 4.0.0

@@ -1,62 +1,71 @@
 <?php
+/**
+ * Define Comrade's namespace.
+ * 
+ * @since 1.0.0
+ */
+namespace Comrade\Classes;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 
 /**
- * Comrade Taxonomy Class
+ * Comrade Taxonomy Class.
  *
  * Re-usable class for registering post type taxonomies.
  *
- * @package WordPress
- * @subpackage Comrade
- * @category Plugin
- * @author Matty
  * @since 1.0.0
  */
-class Comrade_Taxonomy {
+class Taxonomy {
+	/**
+	 * The arguments to use when registering the taxonomy.
+	 * 
+	 * @access  private
+	 * @since   1.0.0
+	 * @var     string
+	 */
+	private $args;
+	
+	/**
+	 * The plural name for the taxonomy.
+	 * 
+	 * @access  private
+	 * @since   1.0.0
+	 * @var     string
+	 */
+	private $plural;
+	
 	/**
 	 * The post type to register the taxonomy for.
+	 * 
 	 * @access  private
-	 * @since   1.3.0
+	 * @since   1.0.0
 	 * @var     string
 	 */
 	private $post_type;
-
-	/**
-	 * The key of the taxonomy.
-	 * @access  private
-	 * @since   1.3.0
-	 * @var     string
-	 */
-	private $token;
-
+	
 	/**
 	 * The singular name for the taxonomy.
+	 * 
 	 * @access  private
-	 * @since   1.3.0
+	 * @since   1.0.0
 	 * @var     string
 	 */
 	private $singular;
 
 	/**
-	 * The plural name for the taxonomy.
+	 * The key of the taxonomy.
+	 * 
 	 * @access  private
-	 * @since   1.3.0
+	 * @since   1.0.0
 	 * @var     string
 	 */
-	private $plural;
-
-	/**
-	 * The arguments to use when registering the taxonomy.
-	 * @access  private
-	 * @since   1.3.0
-	 * @var     string
-	 */
-	private $args;
+	private $token;
 
 	/**
 	 * Class constructor.
+	 * 
 	 * @access  public
-	 * @since   1.3.0
+	 * @since   1.0.0
 	 * @param   string $post_type The post type key.
 	 * @param   string $token     The taxonomy key.
 	 * @param   string $singular  Singular name.
@@ -73,22 +82,22 @@ class Comrade_Taxonomy {
 		if ( '' == $this->plural ) $this->plural = __( 'Categories', 'comrade' );
 
 		$this->args = wp_parse_args( $args, $this->_get_default_args() );
-	} // End __construct()
+	}
 
 	/**
 	 * Return an array of default arguments.
 	 * @access  private
-	 * @since   1.3.0
+	 * @since   1.0.0
 	 * @return  array Default arguments.
 	 */
 	private function _get_default_args () {
 		return array( 'labels' => $this->_get_default_labels(), 'public' => true, 'hierarchical' => true, 'show_ui' => true, 'show_admin_column' => true, 'query_var' => true, 'show_in_nav_menus' => false, 'show_tagcloud' => false );
-	} // End _get_default_args()
+	}
 
 	/**
 	 * Return an array of default labels.
 	 * @access  private
-	 * @since   1.3.0
+	 * @since   1.0.0
 	 * @return  array Default labels.
 	 */
 	private function _get_default_labels () {
@@ -105,16 +114,15 @@ class Comrade_Taxonomy {
 			    'new_item_name'       => sprintf( __( 'New %s Name', 'comrade' ), $this->singular ),
 			    'menu_name'           => sprintf( __( '%s', 'comrade' ), $this->plural )
 			  );
-	} // End _get_default_labels()
+	}
 
 	/**
 	 * Register the taxonomy.
 	 * @access  public
-	 * @since   1.3.0
+	 * @since   1.0.0
 	 * @return  void
 	 */
 	public function register () {
 		register_taxonomy( esc_attr( $this->token ), esc_attr( $this->post_type ), (array)$this->args );
-	} // End register()
-} // End Class
-?>
+	}
+}

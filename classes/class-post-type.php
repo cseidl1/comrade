@@ -1,20 +1,42 @@
 <?php
+/**
+ * Define Comrade's namespace.
+ * 
+ * @since  1.0.0
+ */
+namespace Comrade\Classes;
+
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 
 /**
- * Comrade Post Type Class
+ * Comrade Post Type Class.
  *
- * All functionality pertaining to post types in Comrade.
+ * Provides all functionality pertaining to post types in Comrade.
  *
- * @package WordPress
- * @subpackage Comrade
- * @category Plugin
- * @author Matty
- * @since 1.0.0
+ * @since  1.0.0
  */
-class Comrade_Post_Type {
+class Post_Type {
+	/**
+	 * The post type arguments.
+	 * 
+	 * @access public
+	 * @since  1.0.0
+	 * @var    array
+	 */
+	public $args = array();
+	
+	/**
+	 * The post type plural label.
+	 * 
+	 * @access public
+	 * @since  1.0.0
+	 * @var    string
+	 */
+	public $plural;
+	
 	/**
 	 * The post type token.
+	 * 
 	 * @access public
 	 * @since  1.0.0
 	 * @var    string
@@ -23,6 +45,7 @@ class Comrade_Post_Type {
 
 	/**
 	 * The post type singular label.
+	 * 
 	 * @access public
 	 * @since  1.0.0
 	 * @var    string
@@ -30,45 +53,61 @@ class Comrade_Post_Type {
 	public $singular;
 
 	/**
-	 * The post type plural label.
-	 * @access public
-	 * @since  1.0.0
-	 * @var    string
-	 */
-	public $plural;
-
-	/**
-	 * The post type args.
-	 * @access public
-	 * @since  1.0.0
-	 * @var    array
-	 */
-	public $args;
-
-	/**
 	 * The taxonomies for this post type.
+	 * 
 	 * @access public
 	 * @since  1.0.0
 	 * @var    array
 	 */
-	public $taxonomies;
+	public $taxonomies = array();
+	
+	/**
+	 * Holds the Comrade Engine object.
+	 * 
+	 * @var    object
+	 * @access private
+	 * @since  1.0.0
+	 */
+	 private $engine;
 
 	/**
-	 * Constructor function.
+	 * Class constructor.
 	 *
 	 * @access public
-	 * @since 1.0.0
+	 * @since  1.0.0
 	 */
-	public function __construct( $post_type = 'thing', $singular = '', $plural = '', $args = array(), $taxonomies = array() ) {
-		$this->post_type = $post_type;
-		$this->singular = $singular;
-		$this->plural = $plural;
-		$this->args = $args;
-		$this->taxonomies = $taxonomies;
+	public function __construct(
+		Engine $engine, 
+		$args = array(),
+		$plural = '', 
+		$post_type = 'thing', 
+		$singular = '',  
+		$taxonomies = array()
+	) {
+		$this->engine		= $engine;
+		$this->args		= $args;
+		$this->plural		= $plural;
+		$this->post_type	= $post_type;
+		$this->singular	= $singular;
+		$this->taxonomies	= $taxonomies;
 
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_action( 'init', array( $this, 'register_taxonomy' ) );
+		
+		$this->load_admin();
 
+		add_action( 'after_setup_theme', array( $this, 'ensure_post_thumbnails_support' ) );
+		add_action( 'after_theme_setup', array( $this, 'register_image_sizes' ) );
+	}
+	
+	/**
+	 * Load the admin area for the post type.
+	 * 
+	 * @access private
+	 * @since  1.0.0
+	 * @return void
+	 */
+	private function load_admin() {
 		if ( is_admin() ) {
 			global $pagenow;
 
@@ -82,10 +121,7 @@ class Comrade_Post_Type {
 				add_action( 'manage_posts_custom_column', array( $this, 'register_custom_columns' ), 10, 2 );
 			}
 		}
-
-		add_action( 'after_setup_theme', array( $this, 'ensure_post_thumbnails_support' ) );
-		add_action( 'after_theme_setup', array( $this, 'register_image_sizes' ) );
-	} // End __construct()
+	}
 
 	/**
 	 * Register the post type.
@@ -93,7 +129,7 @@ class Comrade_Post_Type {
 	 * @access public
 	 * @return void
 	 */
-	public function register_post_type () {
+	public function register_post_type() {
 		$labels = array(
 			'name' => sprintf( _x( '%s', 'post type general name', 'comrade' ), $this->plural ),
 			'singular_name' => sprintf( _x( '%s', 'post type singular name', 'comrade' ), $this->singular ),
@@ -132,29 +168,29 @@ class Comrade_Post_Type {
 		$args = wp_parse_args( $this->args, $defaults );
 
 		register_post_type( $this->post_type, $args );
-	} // End register_post_type()
+	}
 
 	/**
 	 * Register the "thing-category" taxonomy.
 	 * @access public
-	 * @since  1.3.0
+	 * @since  1.0.0
 	 * @return void
 	 */
-	public function register_taxonomy () {
-		$this->taxonomies['thing-category'] = new Comrade_Taxonomy(); // Leave arguments empty, to use the default arguments.
+	public function register_taxonomy() {
+		$this->taxonomies['thing-category'] = new Taxonomy(); // Leave arguments empty, to use the default arguments.
 		$this->taxonomies['thing-category']->register();
-	} // End register_taxonomy()
+	}
 
 	/**
 	 * Add custom columns for the "manage" screen of this post type.
 	 *
 	 * @access public
-	 * @param string $column_name
-	 * @param int $id
+	 * @param  string $column_name
+	 * @param  int $id
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function register_custom_columns ( $column_name, $id ) {
+	public function register_custom_columns( $column_name, $id ) {
 		global $post;
 
 		// Uncomment this line to use metadata in the switches below.
@@ -168,17 +204,17 @@ class Comrade_Post_Type {
 			default:
 			break;
 		}
-	} // End register_custom_columns()
+	}
 
 	/**
 	 * Add custom column headings for the "manage" screen of this post type.
 	 *
 	 * @access public
-	 * @param array $defaults
+	 * @param  array $defaults
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function register_custom_column_headings ( $defaults ) {
+	public function register_custom_column_headings( $defaults ) {
 		$new_columns = array( 'image' => __( 'Image', 'comrade' ) );
 
 		$last_item = array();
@@ -200,15 +236,16 @@ class Comrade_Post_Type {
 		}
 
 		return $defaults;
-	} // End register_custom_column_headings()
+	}
 
 	/**
 	 * Update messages for the post type admin.
+	 * 
 	 * @since  1.0.0
 	 * @param  array $messages Array of messages for all post types.
 	 * @return array           Modified array.
 	 */
-	public function updated_messages ( $messages ) {
+	public function updated_messages( $messages ) {
 		global $post, $post_ID;
 
 		$messages[$this->post_type] = array(
@@ -229,7 +266,7 @@ class Comrade_Post_Type {
 		);
 
 		return $messages;
-	} // End updated_messages()
+	}
 
 	/**
 	 * Setup the meta box.
@@ -238,9 +275,9 @@ class Comrade_Post_Type {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function meta_box_setup () {
+	public function meta_box_setup() {
 		add_meta_box( $this->post_type . '-data', __( 'Thing Details', 'comrade' ), array( $this, 'meta_box_content' ), $this->post_type, 'normal', 'high' );
-	} // End meta_box_setup()
+	}
 
 	/**
 	 * The contents of our meta box.
@@ -249,14 +286,14 @@ class Comrade_Post_Type {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function meta_box_content () {
+	public function meta_box_content() {
 		global $post_id;
 		$fields = get_post_custom( $post_id );
 		$field_data = $this->get_custom_fields_settings();
 
 		$html = '';
 
-		$html .= '<input type="hidden" name="comrade_' . $this->post_type . '_noonce" id="comrade_' . $this->post_type . '_noonce" value="' . wp_create_nonce( plugin_basename( dirname( Comrade()->plugin_path ) ) ) . '" />';
+		$html .= '<input type="hidden" name="comrade_' . $this->post_type . '_noonce" id="comrade_' . $this->post_type . '_noonce" value="' . wp_create_nonce( plugin_basename( dirname( $this->engine->plugin_path ) ) ) . '" />';
 
 		if ( 0 < count( $field_data ) ) {
 			$html .= '<table class="form-table">' . "\n";
@@ -278,21 +315,21 @@ class Comrade_Post_Type {
 		}
 
 		echo $html;
-	} // End meta_box_content()
+	}
 
 	/**
 	 * Save meta box fields.
 	 *
 	 * @access public
 	 * @since  1.0.0
-	 * @param int $post_id
+	 * @param  int $post_id
 	 * @return void
 	 */
-	public function meta_box_save ( $post_id ) {
+	public function meta_box_save( $post_id ) {
 		global $post, $messages;
 
 		// Verify
-		if ( ( get_post_type() != $this->post_type ) || ! wp_verify_nonce( $_POST['comrade_' . $this->post_type . '_noonce'], plugin_basename( dirname( Comrade()->plugin_path ) ) ) ) {
+		if ( ( get_post_type() != $this->post_type ) || ! wp_verify_nonce( $_POST['comrade_' . $this->post_type . '_noonce'], plugin_basename( dirname( $this->engine->plugin_path ) ) ) ) {
 			return $post_id;
 		}
 
@@ -326,29 +363,30 @@ class Comrade_Post_Type {
 				delete_post_meta( $post_id, '_' . $f, get_post_meta( $post_id, '_' . $f, true ) );
 			}
 		}
-	} // End meta_box_save()
+	}
 
 	/**
 	 * Customise the "Enter title here" text.
 	 *
 	 * @access public
 	 * @since  1.0.0
-	 * @param string $title
+	 * @param  string $title
 	 * @return void
 	 */
-	public function enter_title_here ( $title ) {
+	public function enter_title_here( $title ) {
 		if ( get_post_type() == $this->post_type ) {
 			$title = __( 'Enter the thing title here', 'comrade' );
 		}
 		return $title;
-	} // End enter_title_here()
+	}
 
 	/**
 	 * Get the settings for the custom fields.
+	 * 
 	 * @since  1.0.0
 	 * @return array
 	 */
-	public function get_custom_fields_settings () {
+	public function get_custom_fields_settings() {
 		$fields = array();
 
 		$fields['url'] = array(
@@ -360,16 +398,17 @@ class Comrade_Post_Type {
 		);
 
 		return apply_filters( 'comrade_custom_fields_settings', $fields );
-	} // End get_custom_fields_settings()
+	}
 
 	/**
 	 * Get the image for the given ID.
-	 * @param  int 				$id   Post ID.
-	 * @param  mixed $size Image dimension. (default: "thing-thumbnail")
+	 * 
+	 * @param  int   $id   Post ID.
+	 * @param  mixed $size Image dimension. (Default: "thing-thumbnail")
 	 * @since  1.0.0
-	 * @return string       	<img> tag.
+	 * @return string      img tag.
 	 */
-	protected function get_image ( $id, $size = 'thing-thumbnail' ) {
+	protected function get_image( $id, $size = 'thing-thumbnail' ) {
 		$response = '';
 
 		if ( has_post_thumbnail( $id ) ) {
@@ -383,46 +422,50 @@ class Comrade_Post_Type {
 		}
 
 		return $response;
-	} // End get_image()
+	}
 
 	/**
 	 * Register image sizes.
+	 * 
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function register_image_sizes () {
+	public function register_image_sizes() {
 		if ( function_exists( 'add_image_size' ) ) {
 			add_image_size( $this->post_type . '-thumbnail', 150, 9999 ); // 150 pixels wide (and unlimited height)
 		}
-	} // End register_image_sizes()
+	}
 
 	/**
 	 * Run on activation.
+	 * 
 	 * @access public
-	 * @since 1.0.0
+	 * @since  1.0.0
 	 * @return void
 	 */
-	public function activation () {
+	public function activation() {
 		$this->flush_rewrite_rules();
-	} // End activation()
+	}
 
 	/**
-	 * Flush the rewrite rules
+	 * Flush the rewrite rules.
+	 * 
 	 * @access public
-	 * @since 1.0.0
+	 * @since  1.0.0
 	 * @return void
 	 */
-	private function flush_rewrite_rules () {
+	private function flush_rewrite_rules() {
 		$this->register_post_type();
 		flush_rewrite_rules();
-	} // End flush_rewrite_rules()
+	}
 
 	/**
 	 * Ensure that "post-thumbnails" support is available for those themes that don't register it.
+	 * 
 	 * @since  1.0.0
-	 * @return  void
+	 * @return void
 	 */
-	public function ensure_post_thumbnails_support () {
+	public function ensure_post_thumbnails_support() {
 		if ( ! current_theme_supports( 'post-thumbnails' ) ) { add_theme_support( 'post-thumbnails' ); }
-	} // End ensure_post_thumbnails_support()
-} // End Class
+	}
+}
